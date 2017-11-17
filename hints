@@ -1,0 +1,31 @@
+telnet 
+Get/? falun HHTP1.1 HOST www.google.com
+GET /search?q=falun+gong HTTP/1.1 
+host: www.google.com
+
+connection:keep alive 
+
+for 404 search 404 
+ip containts TTL
+Question 2:
+ping returns live if its not the firewall and firewall if its the firewall:
+start with the handshake.
+source = random int()
+ser = random.randint(1,11111)
+self.send_park(sport = source , se = seq, flags ="s")
+ptk = self.getptk()
+if is time exceeded (ptk)
+return dead
+
+def get 
+payload such that you can trigger teh firwall
+
+truggge t get /search q=falun 
+
+
+Q3:
+After the initial handshake, we specifiy TTL..
+
+q4:
+the firewal should something different from what server sees..
+the srever 
