@@ -2,7 +2,7 @@ telnet
 Get/? falun HHTP1.1 HOST www.google.com
 GET /search?q=falun+gong HTTP/1.1 
 host: www.google.com
-
+sudo tcp dump -vvvn -i any host : www.miit.gov.cn - w ts.pacp
 connection:keep alive 
 
 for 404 search 404 

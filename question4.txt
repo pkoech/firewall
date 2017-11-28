@@ -1,2 +1,3 @@
 Describe (in 2-3 paragraphs) your evasion strategy:
+I evaded the firewall by breaking down the payload and then sending them character by character and with character I also send some gibberish with the character but with a shorter TTL so that the gibberish does not get to the server. The gibberish should have TTL enough to go past the FIREWALL but shorter to reach the server.
 

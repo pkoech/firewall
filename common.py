@@ -13,12 +13,13 @@ maxhop = 25
 
 # A request that will trigger the great firewall but will NOT cause
 # the web server to process the connection.  You probably want it here
+triggerfetch = "GET / HTTP/1.1\r\nHost: www.google.com\r\nconnection: keep-alive \r\n"
+trigger = "GET / HTTP/1.1\r\nhost: www-inst.eecs.berkeley.edu\r\nconnection: close\r\n\r\n"
 
-triggerfetch = """YOU MIGHT WANT SOMETHING HERE"""
 
 # A couple useful functions that take scapy packets
 def isRST(p):
-    return (TCP in p) and (p[IP][TCP].flags & 0x4 != 0)
+        return (TCP in p) and (p[IP][TCP].flags & 0x4 != 0)
 
 def isICMP(p):
     return ICMP in p
@@ -71,7 +72,7 @@ class PacketUtils:
             nm = int(netmask[x])
             addr = int(srcs[x])
             if x == 3:
-                gateway += "%i" % (addr & nm + 1)
+                gateway += "%i" % ((addr & nm) + 1)
             else:
                 gateway += ("%i" % (addr & nm)) + "."
         sys.stderr.write("Gateway %s\n" % gateway)
@@ -151,14 +152,50 @@ class PacketUtils:
     # ttl is a ttl which triggers the Great Firewall but is before the
     # server itself (from a previous traceroute incantation
     def evade(self, target, msg, ttl):
-        return "NEED TO IMPLEMENT"
+        message = ""
+        msg = trigger
+
+
+        source = random.randint(2000, 30000)
+        sequence = random.randint(1, 31313131)
+        self.send_pkt(flags="S", seq=sequence, sport=source, dip=target)
+        packet = self.get_pkt()
+        if packet:
+            y = packet[TCP].seq
+            sequence += 1
+            self.send_pkt(flags="A", seq=sequence, ack=y+1, sport=source)
+        else:
+            return "DEAD"
+        for m in msg:
+            self.send_pkt(payload = "a", sport = source, flags="PA", seq=sequence,  ack = y+1, dip=target)
+            self.send_pkt(payload = m, sport = source, flags="PA", seq=sequence,  ack = y+1, dip=target, ttl = ttl)
+        packet = self.get_pkt()
+        while(packet):
+            if 'Raw' in packet:
+                message += str(packet['Raw'].load)
+            packet = self.get_pkt()
+        return message
+
         
     # Returns "DEAD" if server isn't alive,
     # "LIVE" if teh server is alive,
     # "FIREWALL" if it is behind the Great Firewall
     def ping(self, target):
-        # self.send_msg([triggerfetch], dst=target, syn=True)
-        return "NEED TO IMPLEMENT"
+        source = random.randint(2000, 30000)
+        sequence = random.randint(1, 31313131)
+        self.send_pkt(flags="S", seq=sequence, sport=source, dip=target,dport=80)
+        pkt = self.get_pkt(5)
+        if pkt == None or isTimeExceeded(pkt):
+                return "DEAD"
+        else:
+            y = pkt[TCP].seq
+            sequence += 1
+            self.send_pkt(payload= triggerfetch, flags="PA", seq=sequence, ack=y+1, sport=source)
+            while(self.get_pkt()):
+                if isRST(self.get_pkt()):
+                    return "FIREWALL"
+                return "LIVE"
+
 
     # Format is
     # ([], [])
@@ -167,27 +204,35 @@ class PacketUtils:
     # The second list is T/F 
     # if there is a RST back for that particular request
     def traceroute(self, target, hops):
-        return "NEED TO IMPLEMENT"
-        ip_list ,rst_List = [][]
-        source = random.randint(2000,3000)
-        seq random.randint(1,31313131)
-        self.send_pkt(sport = source,seq = seq, flags = "s")
-        pkt = self.get_pkt()
-        y = pkt
+            ip_list = []
+            true_list = []
+            source = random.randint(2000,3000)
+            sequence = random.randint(1,31313131)
+            for i in range(1, hops+1):
+                source += 1
+                self.send_pkt(flags="S", sport=source, dip=target)
+                packet = self.get_pkt()
+                if packet != None and TCP in packet:
+                    y = packet[TCP].seq
+                    sequence = packet[TCP].ack
+                    packetget = False
+                    ip = None
+                    self.send_pkt(sport = source, flags="A", seq=sequence,  ack = y+1, dip=target)
+                    self.send_pkt(payload= triggerfetch, flags="PA", seq=sequence, ack=y+1, sport=source,  ttl = i)
+                    while packet != None:
+                        if isRST(packet):
+                            packetget = True
+                        if isICMP(packet) and isTimeExceeded(packet):
+                            ip = packet[IP].src                     
+                        packet = self.get_pkt()
+                    if packetget:
+                        true_list.append(True)
+                    else:
+                        true_list.append(False)
+                    ip_list.append(ip)
+                    #self.packetQueue = Queue.Queue(100000) << i dont know what this line is for
+            return ip_list,true_list
 
-
-Format IS 
-LIST IP ADDRESS CORRESPONDIN TO hops
-the second list is T/F
-
-
-
-
-
-
-
-
-
-
-
-
+#Format IS 
+#LIST IP ADDRESS CORRESPONDIN TO hops
+#the second list is T/F
