@@ -1,0 +1,10 @@
+{\rtf1\ansi\ansicpg1252\cocoartf1561\cocoasubrtf100
+{\fonttbl\f0\fswiss\fcharset0 Helvetica;}
+{\colortbl;\red255\green255\blue255;}
+{\*\expandedcolortbl;;}
+\margl1440\margr1440\vieww10800\viewh8400\viewkind0
+\pard\tx720\tx1440\tx2160\tx2880\tx3600\tx4320\tx5040\tx5760\tx6480\tx7200\tx7920\tx8640\pardirnatural\partightenfactor0
+
+\f0\fs24 \cf0 The project was very interesting but kinda challenging. Also eve though there was no much coding it took longer than I expected. I am glad we got to work with real live environment during this project. I felt happy and motivated to do this project because it involved a real live experience trying to by pass the Great Fire Wall. \
+The class was really interesting and I learned a lot. Nowadays after taking this class am always cautions when I am doing anything either online or even offline.\
+Keep up good work .Thanks a lot}
